@@ -37,26 +37,23 @@ struct ExposureHistoryView: View {
         return formatter.string(from: currentDate)
     }
     
-    // Pre-computed deterministic historical records (Generated ONCE for 100% smooth 60fps scrolling)
+    // Location-tailored daily exposure records (Dynamically updates when active location changes)
     private var records: [DailyExposureRecord] {
-        let severities: [AQISeverity] = [
-            .good, .good, .moderate, .unhealthySensitive,
-            .moderate, .good, .good, .unhealthy,
-            .good, .moderate, .good, .unhealthySensitive,
-            .good, .good, .moderate
-        ]
+        let baseAQI = viewModel.currentAQI
+        let locationHash = abs(viewModel.locationDisplayName.hashValue)
+        
         return (1...daysInMonth).map { day in
-            let severity = severities[(day - 1) % severities.count]
-            let aqi: Int
-            switch severity {
-            case .good: aqi = 25 + (day * 3) % 20
-            case .moderate: aqi = 60 + (day * 5) % 35
-            case .unhealthySensitive: aqi = 110 + (day * 4) % 30
-            case .unhealthy: aqi = 155 + (day * 7) % 30
-            case .veryUnhealthy: aqi = 210 + (day * 2) % 40
-            case .hazardous: aqi = 310 + (day * 9) % 50
+            if day == currentDay {
+                return DailyExposureRecord(id: day, day: day, aqi: baseAQI, severity: viewModel.currentSeverity)
             }
-            return DailyExposureRecord(id: day, day: day, aqi: aqi, severity: severity)
+            
+            // Generate realistic daily AQI variations tailored specifically to the active location
+            let seed = (day * 13 + locationHash % 97)
+            let variation = (seed % 39) - 19
+            let dailyAQI = max(15, min(350, baseAQI + variation))
+            let severity = AQISeverity.from(aqi: dailyAQI)
+            
+            return DailyExposureRecord(id: day, day: day, aqi: dailyAQI, severity: severity)
         }
     }
     
