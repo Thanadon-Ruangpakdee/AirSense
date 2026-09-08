@@ -1,6 +1,6 @@
 # 🍃 AirSense — Personal Health & Air Quality Tracking App
 
-AirSense is a modern, iOS application designed to monitor real-time Air Quality Index (AQI), PM2.5 pollution levels, personal health exposure logs, and interactive air quality analytics. Powered by **SwiftUI**, **SwiftData**, **CoreLocation**, **MapKit**, and the **World Air Quality Index (WAQI) REST API**, AirSense provides actionable health advice accompanied by an interactive **Air Dragon Mascot** that dynamically adapts its expression and safety gear based on air pollution severity.
+AirSense is a modern iOS application designed to monitor real-time Air Quality Index (AQI), PM2.5 pollution levels, personal health exposure logs, and interactive air quality analytics. Powered by **SwiftUI**, **SwiftData**, **CoreLocation**, **MapKit**, and the **World Air Quality Index (WAQI) REST API**, AirSense provides actionable health advice accompanied by an interactive **Air Dragon Mascot** that dynamically adapts its expression and safety gear based on air pollution severity.
 
 ---
 
@@ -18,9 +18,17 @@ AirSense is a modern, iOS application designed to monitor real-time Air Quality 
 | :---: | :---: |
 | ![Live Radar](screenshots/dashboard.png) | ![Saved Places](screenshots/places.png) |
 
-| Exposure Heatmap Calendar | Add Location & Live Search |
+| Add New Location (Live Search & Map) | Location Air Details & Advice |
 | :---: | :---: |
-| ![Exposure History](screenshots/history.png) | ![Add Location](screenshots/add_location.png) |
+| ![Add Location](screenshots/add_location.png) | ![Location Details](screenshots/location_detail.png) |
+
+| Air Analytics & Pollutant Breakdown | Exposure Heatmap Calendar |
+| :---: | :---: |
+| ![Air Analytics](screenshots/analytics.png) | ![Exposure History](screenshots/history.png) |
+
+| App Settings (Language & Appearance) |
+| :---: |
+| ![App Settings](screenshots/settings.png) |
 
 ---
 
@@ -46,7 +54,7 @@ AirSense is a modern, iOS application designed to monitor real-time Air Quality 
 
 6. **🌐 Bilingual & Modern Glassmorphism UI**
    - Dynamic **Thai 🇹🇭 / English 🇺🇸** language switching (`@AppStorage`).
-   - Custom **Light Mode / Dark Mode** theme toggle.
+   - Custom **Light Mode / Dark Mode** theme toggle (`System / Light / Dark`).
    - Glassmorphic UI aesthetics featuring particle background effects.
 
 ---
