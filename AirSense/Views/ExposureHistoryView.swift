@@ -95,10 +95,14 @@ struct ExposureHistoryView: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.85)
                             
-                            Text(isThai ? "บันทึกและสถิติคุณภาพอากาศประจำเดือน" : "PERSONAL HEALTH EXPOSURE LOGS")
-                                .font(.system(size: 9, weight: .bold, design: .rounded))
-                                .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.6) : Color(white: 0.45))
-                                .tracking(1.0)
+                            HStack(spacing: 4) {
+                                Image(systemName: "location.fill")
+                                    .font(.system(size: 8))
+                                Text(viewModel.locationDisplayName)
+                                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                                    .lineLimit(1)
+                            }
+                            .foregroundColor(viewModel.currentSeverity.primaryColor)
                         }
                         Spacer()
                     }
