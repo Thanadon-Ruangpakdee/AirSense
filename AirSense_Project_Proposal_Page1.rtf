@@ -1,0 +1,41 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2759
+\cocoascreenfonts1\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;\f2\fmodern\fcharset0 Courier-Bold;}
+\colortbl;\red255\green255\blue255;\red0\green122\blue255;\red29\green29\blue31;\red134\green134\blue139;
+\paperw11900\paperh16840\margl1134\margr1134\margb1134\margt1134
+\deftab720
+\pcrewrite1
+
+\alignc \f0\fs36 \cf2 PROJECT PROPOSAL\
+\fs28 \cf3 AirSense (Personal Air Quality Radar & Health Companion)\
+\vspace100
+\hrule
+
+\alignl \vspace200
+\f0\fs22 \cf4 COURSE INFORMATION:\cf3 \f1  iOS Application Development (Project 02)\
+\f0\fs22 \cf4 TEAM MEMBERS:\cf3 \f1  1. [Student 1 Name] (ID: [Student ID 1])   |   2. [Student 2 Name] (ID: [Student ID 2])
+
+\vspace300
+\f0\fs26 \cf2 1. APP DESCRIPTION & PROBLEM STATEMENT\
+\f1\fs22 \cf3 Air pollution, particularly PM2.5, is a critical environmental and health concern for residents in Bangkok and urban regions across Thailand. Existing weather applications often display raw pollution metrics without providing personal context, local caching, or actionable health guidelines.\
+\
+\f0 AirSense\f1  is a modern, personalized iOS application engineered to deliver real-time air quality monitoring, personalized health advice, and local historical exposure tracking. The application dynamically transforms its visual ambiance, background gradients, and mascot expressions based on real-time Air Quality Index (AQI) toxicity levels, empowering users to make safe, informed decisions for their daily routines and bookmarked locations (e.g., Home, University, Workplace).
+
+\vspace300
+\f0\fs26 \cf2 2. CORE FEATURES\
+\f1\fs22 \cf3 - \f0 Real-Time GPS Air Quality Monitoring:\f1  Automatically fetches live AQI, PM2.5, PM10, and gas pollutant breakdown based on current GPS location.\
+- \f0 Dynamic Ambiance & Expressive Air Mascot:\f1  Visual theme background color gradients (Green -> Yellow -> Red -> Purple) and mascot expressions adapt dynamically to AQI toxicity levels.\
+- \f0 Saved Favorite Locations:\f1  Allows users to bookmark key places (Home, Uni, Work) for quick side-by-side air quality comparisons.\
+- \f0 Historical Offline Caching & Trends:\f1  Locally caches hourly/daily AQI readings to generate 7-day trend graphs accessible even without an active internet connection.\
+- \f0 Actionable Health Badges:\f1  Displays immediate outdoor activity recommendations (e.g., "Wear N95 Mask", "Close Windows", "Air Purifier Level 3 Recommended").
+
+\vspace300
+\f0\fs26 \cf2 3. TECHNICAL ARCHITECTURE & RUBRIC ALIGNMENT\
+\
+\f0 External REST API Integration:\f1  Connected to WAQI (World Air Quality Index) REST API using modern Swift \f2 URLSession\f1  and \f2 async/await\f1 . Parsed via Swift \f2 Codable\f1  structs with robust error handling (offline state alerts, retry triggers, and skeleton loading views).\
+\
+\f0 Data Persistence:\f1  Implemented using \f2 SwiftData (@Model)\f1  to retain user-saved locations and historical AQI logs locally. Data persists 100% reliably across complete application force-quits and restarts. Uses \f2 UserDefaults\f1  for user notification preferences.\
+\
+\f0 Advanced UI & UX:\f1  Designed in SwiftUI featuring a custom animated circular gauge built with \f2 Canvas\f1 , dynamic background particle effects, \f2 Swift Charts\f1  for trend visualizations, \f2 matchedGeometryEffect\f1  transitions, and haptic feedback.\
+\
+\f0 4 Distinct Screens Hierarchy:\f1  Structured with a \f2 TabView\f1  & \f2 NavigationStack\f1  hierarchy: (1) Live Dashboard, (2) Saved Places, (3) Air Analytics & Breakdown, and (4) Exposure History & Heatmap.
+}

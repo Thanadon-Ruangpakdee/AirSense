@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Proposal - AirSense</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 12mm 15mm;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: #1d1d1f;
+            line-height: 1.35;
+            margin: 0;
+            padding: 10px 15px;
+            background-color: #ffffff;
+            font-size: 10.5pt;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007aff;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18pt;
+            color: #007aff;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .header h2 {
+            margin: 2px 0 0 0;
+            font-size: 12pt;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            background: #f5f5f7;
+            border-radius: 6px;
+        }
+        .meta-table td {
+            padding: 6px 10px;
+            border: none;
+            font-size: 10pt;
+            vertical-align: middle;
+        }
+        .section-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #007aff;
+            border-bottom: 1.5px solid #007aff;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        p {
+            margin: 0 0 6px 0;
+            text-align: justify;
+        }
+        ul {
+            margin: 0 0 8px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 3px;
+        }
+        table.tech-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+            font-size: 9.5pt;
+        }
+        table.tech-table th, table.tech-table td {
+            border: 1px solid #d2d2d7;
+            padding: 5px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        table.tech-table th {
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        .code-tag {
+            background-color: #e8e8ed;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 9pt;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>PROJECT PROPOSAL</h1>
+        <h2>AirSense (Personal Air Quality Radar & Health Companion)</h2>
+    </div>
+
+    <table class="meta-table">
+        <tr>
+            <td style="width: 45%;"><strong>Course:</strong> iOS Application Development (Project 02)</td>
+            <td style="width: 55%;"><strong>Team:</strong> 1. [Student 1 Name] ([ID 1]) &nbsp;|&nbsp; 2. [Student 2 Name] ([ID 2])</td>
+        </tr>
+    </table>
+
+    <div class="section-title">1. App Description & Problem Statement</div>
+    <p>
+        Air pollution, particularly PM2.5, is a critical environmental and health concern for residents in Bangkok and urban regions across Thailand. Existing weather applications often display raw pollution metrics without providing personal context, local caching, or actionable health guidelines.
+    </p>
+    <p>
+        <strong>AirSense</strong> is a personalized iOS application engineered to deliver real-time air quality monitoring, personalized health advice, and local historical exposure tracking. The application dynamically transforms its visual ambiance, background gradients, and mascot expressions based on real-time Air Quality Index (AQI) toxicity levels, empowering users to make safe, informed decisions for their daily routines and bookmarked locations (e.g., Home, University, Workplace).
+    </p>
+
+    <div class="section-title">2. Core Features</div>
+    <ul>
+        <li><strong>Real-Time GPS Air Quality Monitoring:</strong> Automatically fetches live AQI, PM2.5, PM10, and gas pollutant breakdown based on current GPS location.</li>
+        <li><strong>Dynamic Ambiance & Expressive Air Mascot:</strong> Visual theme background color gradients (Green → Yellow → Red → Purple) and mascot expressions adapt dynamically to AQI toxicity levels.</li>
+        <li><strong>Saved Favorite Locations:</strong> Allows users to bookmark key places (Home, Uni, Work) for quick side-by-side air quality comparisons.</li>
+        <li><strong>Historical Offline Caching & Trends:</strong> Locally caches hourly/daily AQI readings to generate 7-day trend graphs accessible even without an active internet connection.</li>
+        <li><strong>Actionable Health Badges:</strong> Displays immediate outdoor activity recommendations (e.g., "Wear N95 Mask", "Close Windows", "Air Purifier Level 3 Recommended").</li>
+    </ul>
+
+    <div class="section-title">3. Technical Architecture & Rubric Compliance</div>
+    <table class="tech-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Category</th>
+                <th style="width: 75%;">Technical Implementation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>External REST API Integration</strong></td>
+                <td>Connected to <strong>WAQI (World Air Quality Index) REST API</strong> using modern Swift <span class="code-tag">URLSession</span> and <span class="code-tag">async/await</span>. Parsed via Swift <span class="code-tag">Codable</span> structs with robust error handling (offline alerts, retry triggers, and skeleton loading views).</td>
+            </tr>
+            <tr>
+                <td><strong>Data Persistence</strong></td>
+                <td>Implemented using <span class="code-tag">SwiftData</span> (<span class="code-tag">@Model</span>) to retain user-saved locations and historical AQI logs locally. Data persists 100% reliably across complete application force-quits and restarts. Uses <span class="code-tag">UserDefaults</span> for user notification preferences.</td>
+            </tr>
+            <tr>
+                <td><strong>Advanced UI & UX</strong></td>
+                <td>Designed in <strong>SwiftUI</strong> featuring a custom animated circular gauge built with <span class="code-tag">Canvas</span>, dynamic background particle effects, <strong>Swift Charts</strong> for trend visualizations, <span class="code-tag">matchedGeometryEffect</span> transitions, and haptic feedback.</td>
+            </tr>
+            <tr>
+                <td><strong>4 Distinct Screens Hierarchy</strong></td>
+                <td>Structured with a <span class="code-tag">TabView</span> &amp; <span class="code-tag">NavigationStack</span> hierarchy: <strong>(1) Live Dashboard</strong>, <strong>(2) Saved Places</strong>, <strong>(3) Air Analytics &amp; Breakdown</strong>, and <strong>(4) Exposure History &amp; Heatmap</strong>.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
