@@ -45,12 +45,12 @@ AirSense is a modern iOS application designed to monitor real-time Air Quality I
    - Save favorite locations (Home, Office, University).
    - Live location autocomplete search powered by `MKLocalSearchCompleter` and interactive `MapKit` pin placement (`MapReader`).
 
-4. **📊 Location Analytics & Comparative Charts**
-   - Detailed AQI trends, pollutant breakdown statistics, and historical comparative data visualization.
+4. **📊 Location Analytics & 7-Day Forecast Charts**
+   - Detailed 7-day AQI future forecast powered by WAQI API, pollutant breakdown statistics (PM2.5, PM10, O3, NO2, SO2, CO), and interactive data visualization.
 
 5. **🗓️ Exposure History & Heatmap Log**
    - Monthly calendar heatmap tracking daily personal exposure levels.
-   - Clean color-coded day tiles, severity legend, and PDF/CSV report export option.
+   - Clean color-coded day tiles, severity legend, and daily log breakdown.
 
 6. **🌐 Bilingual & Modern Glassmorphism UI**
    - Dynamic **Thai 🇹🇭 / English 🇺🇸** language switching (`@AppStorage`).
