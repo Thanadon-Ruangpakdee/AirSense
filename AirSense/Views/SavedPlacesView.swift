@@ -163,26 +163,51 @@ struct SavedPlacesView: View {
         }
         .sheet(isPresented: $showingAddSheet) {
             AddLocationSheet(isPresented: $showingAddSheet, onAdd: { name, lat, lon in
-                let newLoc = SavedLocation(name: name, latitude: lat, longitude: lon, cachedAQI: Int.random(in: 60...160), cachedPM25: Double.random(in: 20...70))
+                let newLoc = SavedLocation(name: name, latitude: lat, longitude: lon, cachedAQI: 50, cachedPM25: 15.0)
                 modelContext.insert(newLoc)
+                
+                // Fetch real live API AQI for newly saved location
+                Task {
+                    if let data = try? await AQIAPIService.shared.fetchAQIByCity(cityName: name) {
+                        newLoc.cachedAQI = data.aqi
+                        newLoc.cachedPM25 = data.pm25Value
+                    } else if let data = try? await AQIAPIService.shared.fetchAQIByCoordinates(latitude: lat, longitude: lon) {
+                        newLoc.cachedAQI = data.aqi
+                        newLoc.cachedPM25 = data.pm25Value
+                    }
+                }
             })
         }
         .sheet(item: $selectedLocationForDetail) { location in
             SavedLocationDetailSheet(location: $selectedLocationForDetail) { targetLoc in
                 Task {
                     await viewModel.fetchAQIForCity(cityName: targetLoc.name, modelContext: modelContext)
+                    if let data = viewModel.currentAQIData {
+                        targetLoc.cachedAQI = data.aqi
+                        targetLoc.cachedPM25 = data.pm25Value
+                    }
                 }
             }
         }
         .onAppear {
             // Seed sample locations if database is empty for demo
             if savedLocations.isEmpty {
-                let loc1 = SavedLocation(name: "🏠 Home (Sukhumvit)", latitude: 13.7367, longitude: 100.5604, cachedAQI: 152, cachedPM25: 65.4)
-                let loc2 = SavedLocation(name: "🎓 Kasetsart University", latitude: 13.8479, longitude: 100.5696, cachedAQI: 85, cachedPM25: 28.1)
-                let loc3 = SavedLocation(name: "🏢 Silom Office", latitude: 13.7268, longitude: 100.5312, cachedAQI: 128, cachedPM25: 46.2)
+                let loc1 = SavedLocation(name: "🏠 Home (Sukhumvit)", latitude: 13.7367, longitude: 100.5604, cachedAQI: 60, cachedPM25: 60.0)
+                let loc2 = SavedLocation(name: "🎓 Kasetsart University", latitude: 13.8479, longitude: 100.5696, cachedAQI: 60, cachedPM25: 60.0)
+                let loc3 = SavedLocation(name: "🏢 Silom Office", latitude: 13.7268, longitude: 100.5312, cachedAQI: 60, cachedPM25: 60.0)
                 modelContext.insert(loc1)
                 modelContext.insert(loc2)
                 modelContext.insert(loc3)
+            }
+            
+            // Sync saved locations live AQI from API
+            Task {
+                for loc in savedLocations {
+                    if let data = try? await AQIAPIService.shared.fetchAQIByCity(cityName: loc.name) {
+                        loc.cachedAQI = data.aqi
+                        loc.cachedPM25 = data.pm25Value
+                    }
+                }
             }
         }
     }
