@@ -6,7 +6,6 @@ import Charts
 struct LocationAnalyticsView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \AirQualityLog.timestamp, order: .forward) private var historicalLogs: [AirQualityLog]
     @AppStorage("appLanguage") private var appLanguage: String = "th"
     
     @ObservedObject var viewModel: AirSenseViewModel
@@ -14,36 +13,7 @@ struct LocationAnalyticsView: View {
     private var isThai: Bool { appLanguage == "th" }
     
     var sampleChartData: [ChartDataPoint] {
-        let calendar = Calendar.current
-        let today = Date()
-        let baseAQI = viewModel.currentAQI
-        let locationHash = abs(viewModel.locationDisplayName.hashValue)
-        let currentDay = calendar.component(.day, from: today)
-        
-        return (0..<7).map { i in
-            let dayOffset = -6 + i
-            let targetDate = calendar.date(byAdding: .day, value: dayOffset, to: today) ?? today
-            let dayNum = calendar.component(.day, from: targetDate)
-            let label = formatDate(targetDate)
-            
-            let aqi: Int
-            if dayNum == currentDay {
-                aqi = baseAQI
-            } else {
-                let seed = (dayNum * 13 + locationHash % 97)
-                let variation = (seed % 39) - 19
-                aqi = max(15, min(350, baseAQI + variation))
-            }
-            
-            return ChartDataPoint(date: targetDate, dayLabel: label, aqi: aqi)
-        }
-    }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: isThai ? "th_TH" : "en_US")
-        formatter.dateFormat = "EEE"
-        return formatter.string(from: date)
+        viewModel.chartDataPoints
     }
     
     var body: some View {

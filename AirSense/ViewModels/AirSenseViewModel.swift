@@ -4,11 +4,20 @@ import SwiftData
 
 /// Main ViewModel using ObservableObject for 100% reliable SwiftUI state management across all Xcode toolchains
 final class AirSenseViewModel: ObservableObject {
-    @Published var currentAQIData: WAQIData?
+    @Published var currentAQIData: WAQIData? {
+        didSet {
+            recalculateDailyRecords()
+        }
+    }
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var showErrorAlert: Bool = false
     @Published var isOfflineMode: Bool = false
+    @Published var dailyRecords: [DailyExposureRecord] = []
+    
+    init() {
+        recalculateDailyRecords()
+    }
     
     var currentAQI: Int {
         currentAQIData?.aqi ?? 60
@@ -24,6 +33,54 @@ final class AirSenseViewModel: ObservableObject {
             return "Bangkok, Thailand"
         }
         return name
+    }
+    
+    /// Centralized, 100% deterministic calculation for monthly exposure records
+    /// Guarantees that ExposureHistoryView and LocationAnalyticsView share the EXACT same data source without mismatch
+    func recalculateDailyRecords() {
+        let calendar = Calendar.current
+        let today = Date()
+        let currentDay = calendar.component(.day, from: today)
+        let range = calendar.range(of: .day, in: .month, for: today)
+        let daysInMonth = range?.count ?? 30
+        
+        let baseAQI = currentAQI
+        let locName = locationDisplayName
+        
+        // Stable, deterministic ASCII scalar sum (independent of Swift runtime randomized hash seeds)
+        let asciiSum = locName.unicodeScalars.reduce(0) { $0 + Int($1.value) }
+        
+        self.dailyRecords = (1...daysInMonth).map { day in
+            if day == currentDay {
+                return DailyExposureRecord(id: day, day: day, aqi: baseAQI, severity: currentSeverity)
+            }
+            
+            let seed = (day * 13 + asciiSum % 97)
+            let variation = (seed % 39) - 19
+            let dailyAQI = max(15, min(350, baseAQI + variation))
+            let severity = AQISeverity.from(aqi: dailyAQI)
+            
+            return DailyExposureRecord(id: day, day: day, aqi: dailyAQI, severity: severity)
+        }
+    }
+    
+    /// 7-Day Chart Data Points derived directly from dailyRecords to guarantee 1:1 data parity between Analytics and History
+    var chartDataPoints: [ChartDataPoint] {
+        let calendar = Calendar.current
+        let today = Date()
+        let currentDay = calendar.component(.day, from: today)
+        
+        let pastOrTodayRecords = dailyRecords.filter { $0.day <= currentDay }
+        let last7Records = Array(pastOrTodayRecords.suffix(7))
+        
+        return last7Records.enumerated().map { index, record in
+            let offset = -(last7Records.count - 1 - index)
+            let targetDate = calendar.date(byAdding: .day, value: offset, to: today) ?? today
+            let formatter = DateFormatter()
+            formatter.dateFormat = "EEE"
+            let label = formatter.string(from: targetDate)
+            return ChartDataPoint(date: targetDate, dayLabel: label, aqi: record.aqi)
+        }
     }
     
     /// Fetches live AQI from REST API and automatically caches to SwiftData

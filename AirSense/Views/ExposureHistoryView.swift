@@ -36,24 +36,9 @@ struct ExposureHistoryView: View {
         return formatter.string(from: currentDate)
     }
     
-    // Location-tailored daily exposure records (Dynamically updates when active location changes)
+    // Location-tailored daily exposure records (Reads directly from central AirSenseViewModel state)
     private var records: [DailyExposureRecord] {
-        let baseAQI = viewModel.currentAQI
-        let locationHash = abs(viewModel.locationDisplayName.hashValue)
-        
-        return (1...daysInMonth).map { day in
-            if day == currentDay {
-                return DailyExposureRecord(id: day, day: day, aqi: baseAQI, severity: viewModel.currentSeverity)
-            }
-            
-            // Generate realistic daily AQI variations tailored specifically to the active location
-            let seed = (day * 13 + locationHash % 97)
-            let variation = (seed % 39) - 19
-            let dailyAQI = max(15, min(350, baseAQI + variation))
-            let severity = AQISeverity.from(aqi: dailyAQI)
-            
-            return DailyExposureRecord(id: day, day: day, aqi: dailyAQI, severity: severity)
-        }
+        viewModel.dailyRecords
     }
     
     // Compact 7-column grid for weekday alignment
