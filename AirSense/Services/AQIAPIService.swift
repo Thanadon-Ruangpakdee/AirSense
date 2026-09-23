@@ -27,8 +27,8 @@ enum AQIError: LocalizedError {
 final class AQIAPIService {
     static let shared = AQIAPIService()
     
-    // WAQI Public Demo API Key (Can be replaced with user's personal key from https://aqicn.org/api/)
-    private let apiKey = "demo"
+    // WAQI Personal API Key
+    private let apiKey = "90806fd817c555a636c6974a633b85b337e4e0cd"
     private let baseURL = "https://api.waqi.info/feed"
     
     private init() {}
