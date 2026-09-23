@@ -36,7 +36,7 @@ final class AQIAPIService {
     /// Fetches AQI data by geographical coordinates (Latitude/Longitude)
     func fetchAQIByCoordinates(latitude: Double, longitude: Double) async throws -> WAQIData {
         let urlString = "\(baseURL)/geo:\(latitude);\(longitude)/?token=\(apiKey)"
-        return try await performRequest(urlString: urlString, fallbackLocation: "Bangkok (Lat: \(String(format: "%.2f", latitude)))")
+        return try await performRequest(urlString: urlString, fallbackLocation: "Bangkok, Thailand")
     }
     
     /// Fetches AQI data by city name
@@ -86,18 +86,20 @@ final class AQIAPIService {
                 return generateMockData(for: fallbackLocation)
             }
         } catch {
-            // Return offline mock data so app UI never crashes or kops
+            // Return offline mock data so app UI never crashes
             return generateMockData(for: fallbackLocation)
         }
     }
     
-    /// Generates realistic mock AQI data when network is unavailable or API key limit is reached
+    /// Generates realistic deterministic mock AQI data so AQI remains stable across tab switches
     func generateMockData(for locationName: String) -> WAQIData {
-        let mockAQI = Int.random(in: 120...165) // Unhealthy range for realistic Bangkok demo
+        // Deterministic AQI score based on location name so it never randomizes on tab navigation
+        let hash = abs(locationName.hashValue)
+        let stableAQI = 115 + (hash % 45) // Consistent stable value e.g. 138
         let mockCity = WAQICity(name: locationName, geo: [13.7563, 100.5018])
         let mockIaqi = WAQIIAQI(
-            pm25: WAQIVal(v: Double(mockAQI) * 0.42),
-            pm10: WAQIVal(v: Double(mockAQI) * 0.62),
+            pm25: WAQIVal(v: Double(stableAQI) * 0.42),
+            pm10: WAQIVal(v: Double(stableAQI) * 0.62),
             o3: WAQIVal(v: 14.2),
             no2: WAQIVal(v: 9.8),
             so2: WAQIVal(v: 3.4),
@@ -106,7 +108,7 @@ final class AQIAPIService {
         let mockTime = WAQITime(s: "2026-09-04 13:00:00", tz: "+07:00")
         
         return WAQIData(
-            aqi: mockAQI,
+            aqi: stableAQI,
             idx: 9999,
             city: mockCity,
             iaqi: mockIaqi,

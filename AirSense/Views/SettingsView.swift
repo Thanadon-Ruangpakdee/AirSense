@@ -1,15 +1,12 @@
 import SwiftUI
-import UserNotifications
 
-/// Tab 5: Settings Screen with Language Selection (Thai/English), Day/Night Theme Mode, Notification Preferences & App Info
+/// Tab 5: Settings Screen with Language Selection (Thai/English), Day/Night Theme Mode & App Info
 struct SettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var viewModel: AirSenseViewModel
     
     @AppStorage("appLanguage") private var appLanguage: String = "th"
     @AppStorage("appThemeMode") private var appThemeMode: String = "system"
-    @AppStorage("enableNotifications") private var enableNotifications: Bool = true
-    @AppStorage("alertThresholdAQI") private var alertThresholdAQI: Int = 100
     
     private var isThai: Bool { appLanguage == "th" }
     
@@ -122,59 +119,7 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, 20)
                     
-                    // 3. Notifications & AQI Alerts Section
-                    GlassCard(cornerRadius: 22, padding: 18) {
-                        VStack(alignment: .leading, spacing: 16) {
-                            HStack {
-                                Image(systemName: "bell.badge.fill")
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundColor(.red)
-                                
-                                Text(isThai ? "การแจ้งเตือนระดับคุณภาพอากาศ" : "AIR QUALITY ALERTS")
-                                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                                    .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.7) : Color(white: 0.4))
-                                    .tracking(1.0)
-                            }
-                            
-                            Toggle(isOn: $enableNotifications) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(isThai ? "แจ้งเตือนเมื่อฝุ่นเกินมาตรฐาน" : "High AQI Alert Notifications")
-                                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                                        .foregroundColor(colorScheme == .dark ? .white : Color(white: 0.15))
-                                    
-                                    Text(isThai ? "ส่งการแจ้งเตือน Push Notification เมื่อค่า AQI อยู่ในเกณฑ์อันตราย (>100)" : "Receive push alerts when AQI exceeds unhealthy threshold (>100)")
-                                        .font(.system(size: 11, weight: .medium))
-                                        .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.6) : Color(white: 0.45))
-                                }
-                            }
-                            .tint(.blue)
-                            .onChange(of: enableNotifications) { _, newValue in
-                                if newValue {
-                                    viewModel.triggerTestNotification(isThai: isThai)
-                                }
-                            }
-                            
-                            if enableNotifications {
-                                Button {
-                                    viewModel.triggerTestNotification(isThai: isThai)
-                                } label: {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: "bell.fill")
-                                            .font(.system(size: 13, weight: .bold))
-                                        Text(isThai ? "ทดสอบส่งการแจ้งเตือนสด (Test Alert Banner)" : "Send Test Notification Banner")
-                                            .font(.system(size: 12, weight: .bold, design: .rounded))
-                                    }
-                                    .foregroundColor(.blue)
-                                    .padding(.vertical, 8)
-                                    .padding(.horizontal, 14)
-                                    .background(Capsule().fill(Color.blue.opacity(0.12)))
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    // 4. App Info & Version Section
+                    // 3. App Info & Version Section
                     GlassCard(cornerRadius: 22, padding: 18) {
                         VStack(spacing: 12) {
                             Image(systemName: "wind.snow")

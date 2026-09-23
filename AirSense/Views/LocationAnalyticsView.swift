@@ -16,6 +16,9 @@ struct LocationAnalyticsView: View {
     var sampleChartData: [ChartDataPoint] {
         let calendar = Calendar.current
         let today = Date()
+        let baseAQI = viewModel.currentAQI
+        let locationHash = abs(viewModel.locationDisplayName.hashValue)
+        let currentDay = calendar.component(.day, from: today)
         
         if historicalLogs.count >= 7 {
             return historicalLogs.suffix(7).enumerated().map { index, log in
@@ -24,12 +27,22 @@ struct LocationAnalyticsView: View {
                 return ChartDataPoint(date: date, dayLabel: label, aqi: log.aqi)
             }
         } else {
-            // Default 7 distinct past days for 7-day trend visualization
-            let mockValues = [55, 78, 112, 165, 142, 128, viewModel.currentAQI]
             return (0..<7).map { i in
-                let date = calendar.date(byAdding: .day, value: -6 + i, to: today) ?? today
-                let label = formatDate(date)
-                return ChartDataPoint(date: date, dayLabel: label, aqi: mockValues[i])
+                let dayOffset = -6 + i
+                let targetDate = calendar.date(byAdding: .day, value: dayOffset, to: today) ?? today
+                let dayNum = calendar.component(.day, from: targetDate)
+                let label = formatDate(targetDate)
+                
+                let aqi: Int
+                if dayNum == currentDay {
+                    aqi = baseAQI
+                } else {
+                    let seed = (dayNum * 13 + locationHash % 97)
+                    let variation = (seed % 39) - 19
+                    aqi = max(15, min(350, baseAQI + variation))
+                }
+                
+                return ChartDataPoint(date: targetDate, dayLabel: label, aqi: aqi)
             }
         }
     }
