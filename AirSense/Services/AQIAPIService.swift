@@ -116,7 +116,7 @@ final class AQIAPIService {
         for dayOffset in 0..<7 {
             if let date = calendar.date(byAdding: .day, value: dayOffset, to: today) {
                 let dateStr = dateFormatter.string(from: date)
-                let variation = (dayOffset * 7 + hash) % 31 - 15
+                let variation = (dayOffset == 0) ? 0 : ((dayOffset * 7 + hash) % 31 - 15)
                 let forecastAQI = max(20, min(250, stableAQI + variation))
                 mockPm25Forecast.append(
                     WAQIDayForecastItem(avg: forecastAQI, day: dateStr, max: forecastAQI + 15, min: max(10, forecastAQI - 15))

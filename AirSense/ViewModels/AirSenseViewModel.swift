@@ -129,7 +129,13 @@ final class AirSenseViewModel: ObservableObject {
             }
         }
         
-        return Array(points.prefix(7))
+        // Ensure today's data point (first point) strictly matches currentAQI
+        var finalPoints = Array(points.prefix(7))
+        if !finalPoints.isEmpty && calendar.isDateInToday(finalPoints[0].date) {
+            finalPoints[0] = ChartDataPoint(date: finalPoints[0].date, dayLabel: finalPoints[0].dayLabel, aqi: currentAQI)
+        }
+        
+        return finalPoints
     }
     
     /// Fetches live AQI from REST API and automatically caches to SwiftData
