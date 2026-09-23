@@ -150,7 +150,24 @@ struct SettingsView: View {
                             .tint(.blue)
                             .onChange(of: enableNotifications) { _, newValue in
                                 if newValue {
-                                    requestNotificationPermission()
+                                    viewModel.triggerTestNotification(isThai: isThai)
+                                }
+                            }
+                            
+                            if enableNotifications {
+                                Button {
+                                    viewModel.triggerTestNotification(isThai: isThai)
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "bell.fill")
+                                            .font(.system(size: 13, weight: .bold))
+                                        Text(isThai ? "ทดสอบส่งการแจ้งเตือนสด (Test Alert Banner)" : "Send Test Notification Banner")
+                                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                                    }
+                                    .foregroundColor(.blue)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, 14)
+                                    .background(Capsule().fill(Color.blue.opacity(0.12)))
                                 }
                             }
                         }
@@ -227,31 +244,3 @@ struct ThemeButton: View {
         }
     }
 }
-
-// MARK: - UserNotifications Local Alert Integration
-extension SettingsView {
-    private func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
-            if granted {
-                DispatchQueue.main.async {
-                    sendSampleHighAQINotification()
-                }
-            }
-        }
-    }
-    
-    private func sendSampleHighAQINotification() {
-        let content = UNMutableNotificationContent()
-        content.title = isThai ? "⚠️ แจ้งเตือนฝุ่นเกินมาตรฐาน!" : "⚠️ High Air Pollution Alert!"
-        content.body = isThai
-            ? "ค่าฝุ่น AQI ในพื้นที่ของคุณ (\(viewModel.locationDisplayName)) พุ่งสูงถึง \(viewModel.currentAQI) (\(viewModel.currentSeverity.title)) ควรรวมหน้ากาก N95 ก่อนออกนอกบ้าน"
-            : "Air Quality Index (AQI) in \(viewModel.locationDisplayName) reached \(viewModel.currentAQI) (\(viewModel.currentSeverity.title)). Please wear an N95 mask before going outdoors."
-        content.sound = .default
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
-        let request = UNNotificationRequest(identifier: "AirSenseHighAQIAlert", content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request)
-    }
-}
-

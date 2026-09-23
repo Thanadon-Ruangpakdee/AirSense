@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Main Glassmorphic Container View featuring a floating glass bottom navigation bar with 5 tabs (including Settings)
 struct MainTabView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var viewModel = AirSenseViewModel()
     @State private var selectedTab: Int = 0
     @AppStorage("appLanguage") private var appLanguage: String = "th"
@@ -9,27 +10,28 @@ struct MainTabView: View {
     private var isThai: Bool { appLanguage == "th" }
     
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Main Tab Content Screens
-            Group {
-                switch selectedTab {
-                case 0:
-                    DashboardView(viewModel: viewModel)
-                case 1:
-                    SavedPlacesView(viewModel: viewModel)
-                case 2:
-                    LocationAnalyticsView(viewModel: viewModel)
-                case 3:
-                    ExposureHistoryView(viewModel: viewModel)
-                case 4:
-                    SettingsView(viewModel: viewModel)
-                default:
-                    DashboardView(viewModel: viewModel)
+        ZStack(alignment: .top) {
+            ZStack(alignment: .bottom) {
+                // Main Tab Content Screens
+                Group {
+                    switch selectedTab {
+                    case 0:
+                        DashboardView(viewModel: viewModel)
+                    case 1:
+                        SavedPlacesView(viewModel: viewModel)
+                    case 2:
+                        LocationAnalyticsView(viewModel: viewModel)
+                    case 3:
+                        ExposureHistoryView(viewModel: viewModel)
+                    case 4:
+                        SettingsView(viewModel: viewModel)
+                    default:
+                        DashboardView(viewModel: viewModel)
+                    }
                 }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            
-            // Floating Glass Bottom Navigation Bar (5 Tabs)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+                // Floating Glass Bottom Navigation Bar (5 Tabs)
             HStack(spacing: 0) {
                 TabButton(icon: "house.fill", label: isThai ? "หน้าหลัก" : "Home", index: 0, selectedTab: $selectedTab, accentColor: viewModel.currentSeverity.primaryColor)
                 TabButton(icon: "bookmark.fill", label: isThai ? "สถานที่" : "Places", index: 1, selectedTab: $selectedTab, accentColor: viewModel.currentSeverity.primaryColor)
@@ -60,8 +62,63 @@ struct MainTabView: View {
             .shadow(color: Color.black.opacity(0.12), radius: 16, x: 0, y: 6)
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
+            }
+            .ignoresSafeArea(.keyboard, edges: .bottom)
+            
+            // In-App Interactive Floating Banner Alert
+            if viewModel.showNotificationBanner {
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "bell.badge.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.red)
+                        .padding(10)
+                        .background(Circle().fill(Color.red.opacity(0.15)))
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(viewModel.bannerTitle)
+                                .font(.system(size: 14, weight: .bold, design: .rounded))
+                                .foregroundColor(colorScheme == .dark ? .white : Color(white: 0.1))
+                            
+                            Spacer()
+                            
+                            Text("NOW")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(Color.gray)
+                        }
+                        
+                        Text(viewModel.bannerMessage)
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.8) : Color(white: 0.3))
+                            .lineLimit(3)
+                    }
+                    
+                    Button {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            viewModel.showNotificationBanner = false
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundColor(Color.gray.opacity(0.6))
+                    }
+                }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: Color.black.opacity(0.18), radius: 20, x: 0, y: 10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .stroke(LinearGradient(colors: [.red.opacity(0.6), .orange.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1.5)
+                        )
+                )
+                .padding(.horizontal, 16)
+                .padding(.top, 50)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .zIndex(999)
+            }
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 }
 
