@@ -12,6 +12,7 @@ struct WAQIData: Codable {
     let city: WAQICity?
     let iaqi: WAQIIAQI?
     let time: WAQITime?
+    let forecast: WAQIForecast?
     
     var pm25Value: Double {
         iaqi?.pm25?.v ?? Double(aqi) * 0.42
@@ -63,4 +64,22 @@ struct WAQIVal: Codable {
 struct WAQITime: Codable {
     let s: String?
     let tz: String?
+}
+
+struct WAQIForecast: Codable {
+    let daily: WAQIDailyForecast?
+}
+
+struct WAQIDailyForecast: Codable {
+    let pm25: [WAQIDayForecastItem]?
+    let pm10: [WAQIDayForecastItem]?
+    let o3: [WAQIDayForecastItem]?
+    let uvi: [WAQIDayForecastItem]?
+}
+
+struct WAQIDayForecastItem: Codable {
+    let avg: Int
+    let day: String
+    let max: Int?
+    let min: Int?
 }

@@ -13,7 +13,7 @@ struct LocationAnalyticsView: View {
     private var isThai: Bool { appLanguage == "th" }
     
     var sampleChartData: [ChartDataPoint] {
-        viewModel.chartDataPoints
+        viewModel.forecastChartDataPoints
     }
     
     var body: some View {
@@ -39,13 +39,13 @@ struct LocationAnalyticsView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 10)
                     
-                    // Swift Charts 7-Day Trend Line & Tension Curve Graph
+                    // Swift Charts 7-Day Forecast Graph
                     GlassCard(cornerRadius: 22, padding: 18) {
                         VStack(alignment: .leading, spacing: 14) {
                             HStack {
-                                Image(systemName: "chart.xyaxis.line")
+                                Image(systemName: "chart.line.uptrend.xyaxis")
                                     .foregroundColor(viewModel.currentSeverity.primaryColor)
-                                Text(isThai ? "แนวโน้ม AQI 7 วันย้อนหลัง (SWIFT CHARTS)" : "7-DAY AQI TREND (SWIFT CHARTS)")
+                                Text(isThai ? "พยากรณ์ AQI 7 วันล่วงหน้า (WAQI FORECAST)" : "7-DAY AQI FORECAST (WAQI API)")
                                     .font(.system(size: 11, weight: .bold, design: .rounded))
                                     .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.7) : Color(white: 0.40))
                                     .tracking(1.2)

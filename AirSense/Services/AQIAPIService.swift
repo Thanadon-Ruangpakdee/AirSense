@@ -78,7 +78,7 @@ final class AQIAPIService {
                 // Override the station name to target location if user did not specifically request Shanghai.
                 if let rawCity = waqiData.city?.name, rawCity.contains("Shanghai"), !fallbackLocation.localizedCaseInsensitiveContains("Shanghai") {
                     let cleanedCity = WAQICity(name: fallbackLocation, geo: waqiData.city?.geo)
-                    return WAQIData(aqi: waqiData.aqi, idx: waqiData.idx, city: cleanedCity, iaqi: waqiData.iaqi, time: waqiData.time)
+                    return WAQIData(aqi: waqiData.aqi, idx: waqiData.idx, city: cleanedCity, iaqi: waqiData.iaqi, time: waqiData.time, forecast: waqiData.forecast)
                 }
                 return waqiData
             } else {
@@ -105,14 +105,34 @@ final class AQIAPIService {
             so2: WAQIVal(v: 3.4),
             co: WAQIVal(v: 0.9)
         )
-        let mockTime = WAQITime(s: "2026-09-04 13:00:00", tz: "+07:00")
+        let mockTime = WAQITime(s: "2026-09-23 13:00:00", tz: "+07:00")
+        
+        let calendar = Calendar.current
+        let today = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        var mockPm25Forecast: [WAQIDayForecastItem] = []
+        for dayOffset in 0..<7 {
+            if let date = calendar.date(byAdding: .day, value: dayOffset, to: today) {
+                let dateStr = dateFormatter.string(from: date)
+                let variation = (dayOffset * 7 + hash) % 31 - 15
+                let forecastAQI = max(20, min(250, stableAQI + variation))
+                mockPm25Forecast.append(
+                    WAQIDayForecastItem(avg: forecastAQI, day: dateStr, max: forecastAQI + 15, min: max(10, forecastAQI - 15))
+                )
+            }
+        }
+        
+        let mockForecast = WAQIForecast(daily: WAQIDailyForecast(pm25: mockPm25Forecast, pm10: nil, o3: nil, uvi: nil))
         
         return WAQIData(
             aqi: stableAQI,
             idx: 9999,
             city: mockCity,
             iaqi: mockIaqi,
-            time: mockTime
+            time: mockTime,
+            forecast: mockForecast
         )
     }
 }
