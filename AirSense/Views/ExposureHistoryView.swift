@@ -15,7 +15,6 @@ struct ExposureHistoryView: View {
     @ObservedObject var viewModel: AirSenseViewModel
     @AppStorage("appLanguage") private var appLanguage: String = "th"
     
-    @State private var showingExportAlert: Bool = false
     @State private var selectedDay: Int? = nil
     
     private var isThai: Bool { appLanguage == "th" }
@@ -217,36 +216,10 @@ struct ExposureHistoryView: View {
                             }
                         }
                         .padding(.horizontal, 16)
+                        .padding(.bottom, 120)
                     }
-                    
-                    // Export Button
-                    Button {
-                        showingExportAlert = true
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "square.and.arrow.up.fill")
-                                .font(.system(size: 14, weight: .bold))
-                            Text(isThai ? "ส่งออกรายงานประวัติสัมผัสฝุ่น (PDF / CSV)" : "Export Exposure Log (PDF / CSV)")
-                                .font(.system(size: 14, weight: .bold, design: .rounded))
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(
-                            Capsule()
-                                .fill(LinearGradient(colors: [.blue, Color.blue.opacity(0.8)], startPoint: .leading, endPoint: .trailing))
-                                .shadow(color: Color.blue.opacity(0.25), radius: 8, x: 0, y: 4)
-                        )
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 120) // Extended bottom padding for clear bottom floating tab bar spacing
                 }
             }
-        }
-        .alert(isThai ? "ส่งออกรายงานสำเร็จ" : "Export Successful", isPresented: $showingExportAlert) {
-            Button(isThai ? "ตกลง" : "OK", role: .cancel) {}
-        } message: {
-            Text(isThai ? "ระบบได้ทำการส่งออกไฟล์ประวัติ AirSense ไปยังแอป Files เรียบร้อยแล้ว" : "AirSense exposure history report has been saved to your Files app.")
         }
     }
 }
