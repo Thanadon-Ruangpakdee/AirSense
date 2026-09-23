@@ -11,7 +11,7 @@ final class AirSenseViewModel: ObservableObject {
     @Published var isOfflineMode: Bool = false
     
     var currentAQI: Int {
-        currentAQIData?.aqi ?? 138
+        currentAQIData?.aqi ?? 60
     }
     
     var currentSeverity: AQISeverity {
@@ -20,7 +20,7 @@ final class AirSenseViewModel: ObservableObject {
     
     var locationDisplayName: String {
         let name = currentAQIData?.cityName ?? "Bangkok, Thailand"
-        if name.contains("Shanghai") {
+        if name.contains("Shanghai") || name.contains("San Francisco") {
             return "Bangkok, Thailand"
         }
         return name
@@ -38,7 +38,7 @@ final class AirSenseViewModel: ObservableObject {
             self.isLoading = false
             self.isOfflineMode = false
             
-            // Auto-log into SwiftData for historical trend charts
+            // Auto-log into SwiftData for historical trend charts & sync saved location cache
             if let context = modelContext {
                 logAQIToSwiftData(data: data, context: context)
             }
@@ -71,6 +71,10 @@ final class AirSenseViewModel: ObservableObject {
             self.isOfflineMode = true
             let fallback = AQIAPIService.shared.generateMockData(for: cityName)
             self.currentAQIData = fallback
+            
+            if let context = modelContext {
+                logAQIToSwiftData(data: fallback, context: context)
+            }
         }
     }
     
@@ -89,5 +93,16 @@ final class AirSenseViewModel: ObservableObject {
             timestamp: Date()
         )
         context.insert(log)
+        
+        // Auto-update matching SavedLocation cache in SwiftData for 100% data consistency across all views
+        let descriptor = FetchDescriptor<SavedLocation>()
+        if let savedLocations = try? context.fetch(descriptor) {
+            for loc in savedLocations {
+                if loc.name.localizedCaseInsensitiveContains(data.cityName) || data.cityName.localizedCaseInsensitiveContains(loc.name) {
+                    loc.cachedAQI = data.aqi
+                    loc.cachedPM25 = data.pm25Value
+                }
+            }
+        }
     }
 }
