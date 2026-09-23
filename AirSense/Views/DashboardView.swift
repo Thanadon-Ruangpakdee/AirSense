@@ -7,7 +7,6 @@ struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage("appLanguage") private var appLanguage: String = "th"
     @ObservedObject var viewModel: AirSenseViewModel
-    @StateObject private var locationManager = LocationManager()
     
     private var isThai: Bool { appLanguage == "th" }
     
@@ -39,34 +38,29 @@ struct DashboardView: View {
                         
                         Spacer()
                         
-                        // Location Refresh Button
+                        // Location Refresh Button (Locked to Bangkok)
                         Button {
-                                locationManager.requestLocation()
-                                Task {
-                                    if let loc = locationManager.userLocation {
-                                        await viewModel.fetchCurrentAQI(latitude: loc.latitude, longitude: loc.longitude, modelContext: modelContext)
-                                    } else {
-                                        await viewModel.fetchCurrentAQI(modelContext: modelContext)
-                                    }
-                                }
-                            } label: {
-                                ZStack {
-                                    Circle()
-                                        .fill(colorScheme == .dark ? Color.white.opacity(0.15) : Color.white.opacity(0.85))
-                                        .frame(width: 40, height: 40)
-                                        .shadow(color: colorScheme == .dark ? Color.black.opacity(0.3) : Color.black.opacity(0.08), radius: 8, x: 0, y: 3)
-                                        .overlay(Circle().stroke(colorScheme == .dark ? Color.white.opacity(0.2) : Color.white, lineWidth: 1))
-                                    
-                                    if viewModel.isLoading {
-                                        ProgressView()
-                                            .tint(viewModel.currentSeverity.primaryColor)
-                                    } else {
-                                        Image(systemName: "arrow.clockwise")
-                                            .font(.system(size: 15, weight: .bold))
-                                            .foregroundColor(colorScheme == .dark ? .white : Color(red: 0.15, green: 0.2, blue: 0.3))
-                                    }
+                            Task {
+                                await viewModel.fetchCurrentAQI(latitude: 13.7563, longitude: 100.5018, modelContext: modelContext)
+                            }
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(colorScheme == .dark ? Color.white.opacity(0.15) : Color.white.opacity(0.85))
+                                    .frame(width: 40, height: 40)
+                                    .shadow(color: colorScheme == .dark ? Color.black.opacity(0.3) : Color.black.opacity(0.08), radius: 8, x: 0, y: 3)
+                                    .overlay(Circle().stroke(colorScheme == .dark ? Color.white.opacity(0.2) : Color.white, lineWidth: 1))
+                                
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .tint(viewModel.currentSeverity.primaryColor)
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                        .font(.system(size: 15, weight: .bold))
+                                        .foregroundColor(colorScheme == .dark ? .white : Color(red: 0.15, green: 0.2, blue: 0.3))
                                 }
                             }
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 10)
@@ -108,9 +102,9 @@ struct DashboardView: View {
                             }
                             
                             HStack(spacing: 12) {
-                                PollutantPill(name: "PM2.5", value: String(format: "%.1f", viewModel.currentAQIData?.pm25Value ?? 65.4), unit: "µg/m³", color: viewModel.currentSeverity.primaryColor)
-                                PollutantPill(name: "PM10", value: String(format: "%.1f", viewModel.currentAQIData?.pm10Value ?? 88.2), unit: "µg/m³", color: Color(red: 0.85, green: 0.55, blue: 0.0))
-                                PollutantPill(name: "O3", value: String(format: "%.1f", viewModel.currentAQIData?.o3Value ?? 14.2), unit: "ppb", color: Color(red: 0.0, green: 0.55, blue: 0.75))
+                                PollutantPill(name: "PM2.5", value: String(format: "%.1f", viewModel.currentAQIData?.pm25Value ?? 60.0), unit: "µg/m³", color: viewModel.currentSeverity.primaryColor)
+                                PollutantPill(name: "PM10", value: String(format: "%.1f", viewModel.currentAQIData?.pm10Value ?? 31.0), unit: "µg/m³", color: Color(red: 0.85, green: 0.55, blue: 0.0))
+                                PollutantPill(name: "O3", value: String(format: "%.1f", viewModel.currentAQIData?.o3Value ?? 4.8), unit: "ppb", color: Color(red: 0.0, green: 0.55, blue: 0.75))
                             }
                         }
                     }
@@ -139,9 +133,7 @@ struct DashboardView: View {
             }
         }
         .task {
-            locationManager.requestLocation()
-            await viewModel.fetchCurrentAQI(modelContext: modelContext)
+            await viewModel.fetchCurrentAQI(latitude: 13.7563, longitude: 100.5018, modelContext: modelContext)
         }
     }
 }
-
