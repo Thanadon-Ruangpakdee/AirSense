@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 /// Tab 5: Settings Screen with Language Selection (Thai/English), Day/Night Theme Mode, Notification Preferences & App Info
 struct SettingsView: View {
@@ -141,12 +142,17 @@ struct SettingsView: View {
                                         .font(.system(size: 14, weight: .bold, design: .rounded))
                                         .foregroundColor(colorScheme == .dark ? .white : Color(white: 0.15))
                                     
-                                    Text(isThai ? "ส่งการแจ้งเตือนเมื่อค่า AQI อยู่ในเกณฑ์อันตราย" : "Receive push alerts when air quality worsens")
+                                    Text(isThai ? "ส่งการแจ้งเตือน Push Notification เมื่อค่า AQI อยู่ในเกณฑ์อันตราย (>100)" : "Receive push alerts when AQI exceeds unhealthy threshold (>100)")
                                         .font(.system(size: 11, weight: .medium))
                                         .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.6) : Color(white: 0.45))
                                 }
                             }
                             .tint(.blue)
+                            .onChange(of: enableNotifications) { _, newValue in
+                                if newValue {
+                                    requestNotificationPermission()
+                                }
+                            }
                         }
                     }
                     .padding(.horizontal, 20)
@@ -217,8 +223,35 @@ struct ThemeButton: View {
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .fill(isSelected ? Color.blue : (colorScheme == .dark ? Color.white.opacity(0.08) : Color.black.opacity(0.05)))
-                    .shadow(color: isSelected ? Color.blue.opacity(0.3) : Color.clear, radius: 4, x: 0, y: 2)
             )
         }
     }
 }
+
+// MARK: - UserNotifications Local Alert Integration
+extension SettingsView {
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+            if granted {
+                DispatchQueue.main.async {
+                    sendSampleHighAQINotification()
+                }
+            }
+        }
+    }
+    
+    private func sendSampleHighAQINotification() {
+        let content = UNMutableNotificationContent()
+        content.title = isThai ? "⚠️ แจ้งเตือนฝุ่นเกินมาตรฐาน!" : "⚠️ High Air Pollution Alert!"
+        content.body = isThai
+            ? "ค่าฝุ่น AQI ในพื้นที่ของคุณ (\(viewModel.locationDisplayName)) พุ่งสูงถึง \(viewModel.currentAQI) (\(viewModel.currentSeverity.title)) ควรรวมหน้ากาก N95 ก่อนออกนอกบ้าน"
+            : "Air Quality Index (AQI) in \(viewModel.locationDisplayName) reached \(viewModel.currentAQI) (\(viewModel.currentSeverity.title)). Please wear an N95 mask before going outdoors."
+        content.sound = .default
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+        let request = UNNotificationRequest(identifier: "AirSenseHighAQIAlert", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request)
+    }
+}
+
