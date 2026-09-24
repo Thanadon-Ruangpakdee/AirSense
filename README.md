@@ -57,7 +57,7 @@ AirSense is a modern iOS application designed to monitor real-time Air Quality I
    - Custom **Light Mode / Dark Mode** theme toggle (`System / Light / Dark`).
    - Glassmorphic UI aesthetics featuring particle background effects.
 
---
+---
 
 ## 🛠️ Tech Stack & Requirements
 
@@ -67,7 +67,7 @@ AirSense is a modern iOS application designed to monitor real-time Air Quality I
 - **Minimum OS:** iOS 17.0+
 - **IDE:** Xcode 15.0+
 
---
+---
 
 ## 🚀 How to Run the Project
 
